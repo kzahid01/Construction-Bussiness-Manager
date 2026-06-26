@@ -1,0 +1,21 @@
+// Root build.gradle — Construction Manager
+// Plugin versions are declared in settings.gradle (declarative block).
+// This file only configures build output directories.
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

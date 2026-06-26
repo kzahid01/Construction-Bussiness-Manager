@@ -1,0 +1,61 @@
+# ── Flutter / Dart ────────────────────────────────────────────
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.iml
+
+# Generated files
+lib/generated_plugin_registrant.dart
+
+# Codemagic / CI artifacts
+app-debug.apk
+app-release.apk
+app-release.aab
+*.keystore
+*.jks
+key.properties
+
+# ── Android ───────────────────────────────────────────────────
+# CRITICAL: local.properties contains machine-specific SDK/Flutter paths
+# Codemagic generates this automatically — never commit it
+android/local.properties
+android/.gradle/
+android/captures/
+android/gradlew        
+android/gradlew.bat    
+
+# Keep gradle wrapper JAR and properties (required by Codemagic)
+!android/gradle/wrapper/gradle-wrapper.jar
+!android/gradle/wrapper/gradle-wrapper.properties
+
+# ── Python / Backend ──────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+*.egg
+.env
+venv/
+.venv/
+env/
+
+# Database (dev only)
+backend/construction.db
+*.db
+*.sqlite3
+
+# ── IDE ───────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db

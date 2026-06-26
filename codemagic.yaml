@@ -1,0 +1,119 @@
+workflows:
+
+  # ── Release build (signed APK + AAB for Play Store) ────────────────────────
+  android-release:
+    name: Android Release Build
+    max_build_duration: 60
+
+    environment:
+      flutter: 3.22.0
+      java: 17
+      # To enable signed release builds, create an Environment Variable Group
+      # named "keystore_credentials" in Codemagic with these variables:
+      #   CM_KEYSTORE       — your .jks file (File type)
+      #   CM_KEY_ALIAS      — key alias
+      #   CM_KEY_PASSWORD   — key password
+      #   CM_STORE_PASSWORD — keystore password
+      # Then uncomment the line below:
+      # groups:
+      #   - keystore_credentials
+      vars:
+        PACKAGE_NAME: "com.construction.management.app"
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+
+    scripts:
+      - name: Set up key.properties
+        # Writes key.properties only when all required env vars are present.
+        # If they are not set, the file is NOT created and Gradle falls back
+        # to debug signing automatically (build still succeeds).
+        script: |
+          if [ -n "$CM_KEYSTORE" ] && [ -n "$CM_KEY_ALIAS" ] && \
+             [ -n "$CM_KEY_PASSWORD" ] && [ -n "$CM_STORE_PASSWORD" ]; then
+            echo "Writing key.properties for signed release build..."
+            cat >> "$CM_BUILD_DIR/android/key.properties" <<EOF
+          storePassword=$CM_STORE_PASSWORD
+          keyPassword=$CM_KEY_PASSWORD
+          keyAlias=$CM_KEY_ALIAS
+          storeFile=$CM_KEYSTORE
+          EOF
+            echo "key.properties written successfully."
+          else
+            echo "No keystore env vars found — build will use debug signing (unsigned release)."
+          fi
+
+      - name: Get Flutter packages
+        script: flutter pub get
+
+      - name: Run Flutter analyze
+        script: flutter analyze --no-fatal-warnings --no-fatal-infos
+
+      - name: Build Android APK (release)
+        script: |
+          flutter build apk \
+            --release \
+            --build-name=1.0.0 \
+            --build-number=1
+
+      - name: Build Android App Bundle (for Play Store)
+        script: |
+          flutter build appbundle \
+            --release \
+            --build-name=1.0.0 \
+            --build-number=1
+
+    artifacts:
+      - build/app/outputs/flutter-apk/app-release.apk
+      - build/app/outputs/bundle/release/app-release.aab
+
+    publishing:
+      email:
+        recipients:
+          - khawajazahid092@gmail.com
+        notify:
+          success: true
+          failure: true
+
+  # ── Debug build (no signing required — fastest for testing) ────────────────
+  android-debug:
+    name: Android Debug Build
+    max_build_duration: 30
+
+    environment:
+      flutter: 3.22.0
+      java: 17
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: develop
+          include: true
+        - pattern: feature/*
+          include: true
+
+    scripts:
+      - name: Get Flutter packages
+        script: flutter pub get
+
+      - name: Run Flutter analyze
+        script: flutter analyze --no-fatal-warnings --no-fatal-infos
+
+      - name: Build debug APK
+        script: flutter build apk --debug
+
+    artifacts:
+      - build/app/outputs/flutter-apk/app-debug.apk
+
+    publishing:
+      email:
+        recipients:
+          - khawajazahid092@gmail.com
+        notify:
+          success: true
+          failure: true

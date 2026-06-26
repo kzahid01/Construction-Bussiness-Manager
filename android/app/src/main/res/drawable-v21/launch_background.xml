@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launch background for API 21+ (Lollipop and above).
+     Uses the same navy-blue brand color as the app primary. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <color android:color="#1B4F72"/>
+    </item>
+</layer-list>
